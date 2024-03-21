@@ -126,14 +126,7 @@ void UMenu::HostButtonClicked()
 
 void UMenu::JoinButtonClicked()
 {
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1,
-			15.f,
-			FColor::Yellow,
-			FString(TEXT("JoinButtonClicked"))
-			);
-	}
+	
 }
 
 void UMenu::MenuTearDown()
