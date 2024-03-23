@@ -2,11 +2,9 @@
 
 
 #include "Menu.h"
-
 #include "Components/Button.h"
 #include "MultiplayerSessionsSubsystem.h"
 #include "OnlineSessionSettings.h"
-#include "Interfaces/OnlineSessionInterface.h"
 #include "OnlineSubsystem.h"
 
 void UMenu::MenuSetup(int32 NumberOfPublicConnections, FString TypeOfMatch, FString LobbyPath)
@@ -16,7 +14,8 @@ void UMenu::MenuSetup(int32 NumberOfPublicConnections, FString TypeOfMatch, FStr
 	MatchType = TypeOfMatch;
 	AddToViewport();
 	SetVisibility(ESlateVisibility::Visible);
-	SetIsFocusable(true); //bIsFocusable = true; obsolete for my version.
+	SetIsFocusable(true);
+	//bIsFocusable = true;
 
 	UWorld* World = GetWorld();
 	if (World)
@@ -50,24 +49,26 @@ void UMenu::MenuSetup(int32 NumberOfPublicConnections, FString TypeOfMatch, FStr
 
 bool UMenu::Initialize()
 {
-	if (!Super::Initialize()) return false;
+	if (!Super::Initialize())
+	{
+		return false;
+	}
 
 	if (HostButton)
 	{
-		HostButton->OnClicked.AddDynamic(this, &UMenu::HostButtonClicked);
+		HostButton->OnClicked.AddDynamic(this, &ThisClass::HostButtonClicked);
 	}
 	if (JoinButton)
 	{
-		JoinButton->OnClicked.AddDynamic(this, &UMenu::JoinButtonClicked);
+		JoinButton->OnClicked.AddDynamic(this, &ThisClass::JoinButtonClicked);
 	}
-	
+
 	return true;
 }
 
 void UMenu::NativeDestruct()
 {
 	MenuTearDown();
-	
 	Super::NativeDestruct();
 }
 
@@ -75,15 +76,6 @@ void UMenu::OnCreateSession(bool bWasSuccessful)
 {
 	if (bWasSuccessful)
 	{
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(
-			-1,
-			15.f,
-			FColor::Green,
-			FString(TEXT("Session Created Successfully!"))
-			);
-		}
 		UWorld* World = GetWorld();
 		if (World)
 		{
@@ -94,10 +86,11 @@ void UMenu::OnCreateSession(bool bWasSuccessful)
 	{
 		if (GEngine)
 		{
-			GEngine->AddOnScreenDebugMessage(-1,
-			15.f,
-			FColor::Red,
-			FString(TEXT("Failed to create session!!l"))
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				15.f,
+				FColor::Red,
+				FString(TEXT("Failed to create session!"))
 			);
 		}
 		HostButton->SetIsEnabled(true);
@@ -106,8 +99,11 @@ void UMenu::OnCreateSession(bool bWasSuccessful)
 
 void UMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& SessionResults, bool bWasSuccessful)
 {
-	if (MultiplayerSessionsSubsystem == nullptr) return;
-	
+	if (MultiplayerSessionsSubsystem == nullptr)
+	{
+		return;
+	}
+
 	for (auto Result : SessionResults)
 	{
 		FString SettingsValue;
@@ -141,10 +137,6 @@ void UMenu::OnJoinSession(EOnJoinSessionCompleteResult::Type Result)
 				PlayerController->ClientTravel(Address, ETravelType::TRAVEL_Absolute);
 			}
 		}
-	}
-	if (Result != EOnJoinSessionCompleteResult::Success)
-	{
-		JoinButton->SetIsEnabled(true);
 	}
 }
 
